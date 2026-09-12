@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mukti-fastapi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mukti-fastapi
+  template:
+    metadata:
+      labels:
+        app: mukti-fastapi
+    spec:
+      containers:
+        - name: mukti-fastapi
+          image: muktiacr.azurecr.io/mukti-fastapi:latest
+          ports:
+            - containerPort: 8000

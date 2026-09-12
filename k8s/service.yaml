@@ -1,0 +1,12 @@
+aaapiVersion: v1
+kind: Service
+metadata:
+  name: mukti-fastapi-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: mukti-fastapi
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8000
