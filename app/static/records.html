@@ -1,0 +1,417 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Contact Records</title>
+
+
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            margin: 0;
+            padding: 30px;
+        }
+
+
+        .container {
+
+            max-width: 1000px;
+
+            margin: auto;
+
+            background: white;
+
+            padding: 30px;
+
+            border-radius: 10px;
+
+            box-shadow:
+                0 2px 10px rgba(0,0,0,0.1);
+
+        }
+
+
+        h1 {
+
+            text-align: center;
+
+            margin-bottom: 25px;
+
+        }
+
+
+        .top-bar {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            margin-bottom: 20px;
+
+        }
+
+
+        .back-link {
+
+            color: #0078d4;
+
+            text-decoration: none;
+
+            font-weight: bold;
+
+        }
+
+
+        .back-link:hover {
+
+            text-decoration: underline;
+
+        }
+
+
+        button {
+
+            padding: 10px 18px;
+
+            border: none;
+
+            border-radius: 5px;
+
+            background: #0078d4;
+
+            color: white;
+
+            cursor: pointer;
+
+        }
+
+
+        button:hover {
+
+            background: #005ea6;
+
+        }
+
+
+        table {
+
+            width: 100%;
+
+            border-collapse: collapse;
+
+        }
+
+
+        th,
+        td {
+
+            border: 1px solid #ddd;
+
+            padding: 12px;
+
+            text-align: left;
+
+        }
+
+
+        th {
+
+            background: #f0f0f0;
+
+        }
+
+
+        tr:nth-child(even) {
+
+            background: #fafafa;
+
+        }
+
+
+        .message {
+
+            text-align: center;
+
+            padding: 20px;
+
+            font-weight: bold;
+
+        }
+
+
+        .count {
+
+            margin-bottom: 15px;
+
+            font-weight: bold;
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+    <h1>
+        Contact Records
+    </h1>
+
+
+    <div class="top-bar">
+
+        <a
+            href="/"
+            class="back-link"
+        >
+            ← Back to Contact Form
+        </a>
+
+
+        <button
+            onclick="loadRecords()"
+        >
+            Refresh
+        </button>
+
+    </div>
+
+
+    <div
+        id="count"
+        class="count"
+    >
+        Loading records...
+    </div>
+
+
+    <table>
+
+        <thead>
+
+            <tr>
+
+                <th>
+                    ID
+                </th>
+
+                <th>
+                    Name
+                </th>
+
+                <th>
+                    Phone Number
+                </th>
+
+                <th>
+                    Created At
+                </th>
+
+            </tr>
+
+        </thead>
+
+
+        <tbody id="recordsTable">
+
+        </tbody>
+
+    </table>
+
+
+    <div
+        id="message"
+        class="message"
+    >
+    </div>
+
+
+</div>
+
+
+<script>
+
+
+async function loadRecords() {
+
+    const table =
+        document.getElementById(
+            "recordsTable"
+        );
+
+    const count =
+        document.getElementById(
+            "count"
+        );
+
+    const message =
+        document.getElementById(
+            "message"
+        );
+
+
+    table.innerHTML = "";
+
+    message.textContent =
+        "";
+
+    count.textContent =
+        "Loading records...";
+
+
+    try {
+
+
+        const response =
+            await fetch(
+                "/contacts"
+            );
+
+
+        const result =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                result.detail ||
+                "Failed to fetch records"
+            );
+
+        }
+
+
+        const records =
+            result.data || [];
+
+
+        count.textContent =
+            "Total Records: " +
+            records.length;
+
+
+        if (records.length === 0) {
+
+            message.textContent =
+                "No records found.";
+
+            return;
+
+        }
+
+
+        records.forEach(
+            function(record) {
+
+                const row =
+                    document.createElement(
+                        "tr"
+                    );
+
+
+                row.innerHTML = `
+
+                    <td>
+                        ${escapeHtml(
+                            record.id || ""
+                        )}
+                    </td>
+
+                    <td>
+                        ${escapeHtml(
+                            record.name || ""
+                        )}
+                    </td>
+
+                    <td>
+                        ${escapeHtml(
+                            record.phone || ""
+                        )}
+                    </td>
+
+                    <td>
+                        ${escapeHtml(
+                            record.createdAt || ""
+                        )}
+                    </td>
+
+                `;
+
+
+                table.appendChild(row);
+
+            }
+        );
+
+
+    }
+    catch (error) {
+
+        console.error(error);
+
+        count.textContent =
+            "";
+
+        message.textContent =
+            "Error loading records: " +
+            error.message;
+
+    }
+
+}
+
+
+/*
+ * Prevent HTML injection when displaying
+ * database values.
+ */
+
+function escapeHtml(value) {
+
+    return String(value)
+
+        .replaceAll("&", "&amp;")
+
+        .replaceAll("<", "&lt;")
+
+        .replaceAll(">", "&gt;")
+
+        .replaceAll('"', "&quot;")
+
+        .replaceAll("'", "&#039;");
+
+}
+
+
+/*
+ * Automatically load records
+ * when page opens.
+ */
+
+loadRecords();
+
+</script>
+
+
+</body>
+
+</html>

@@ -1,0 +1,257 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Contact Form</title>
+
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            margin: 0;
+            padding: 40px;
+        }
+
+        .container {
+            width: 400px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 25px;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            background: #0078d4;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #005ea6;
+        }
+
+        .records-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #0078d4;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .records-link:hover {
+            text-decoration: underline;
+        }
+
+        #message {
+            margin-top: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="container">
+
+    <h1>Contact Form</h1>
+
+
+    <form id="contactForm">
+
+        <label for="name">
+            Name
+        </label>
+
+        <input
+            type="text"
+            id="name"
+            name="name"
+            placeholder="Enter your name"
+            required
+        >
+
+
+        <label for="phone">
+            Phone Number
+        </label>
+
+        <input
+            type="text"
+            id="phone"
+            name="phone"
+            placeholder="Enter phone number"
+            required
+        >
+
+
+        <button type="submit">
+            Submit
+        </button>
+
+    </form>
+
+
+    <div id="message"></div>
+
+
+    <!-- New link -->
+
+    <a
+        href="/records"
+        class="records-link"
+    >
+        Display Records →
+    </a>
+
+</div>
+
+
+<script>
+
+    const form =
+        document.getElementById("contactForm");
+
+    const message =
+        document.getElementById("message");
+
+
+    form.addEventListener(
+        "submit",
+        async function(event) {
+
+            event.preventDefault();
+
+
+            const nameInput =
+                document.getElementById("name");
+
+            const phoneInput =
+                document.getElementById("phone");
+
+
+            const name =
+                nameInput.value.trim();
+
+            const phone =
+                phoneInput.value.trim();
+
+
+            if (!name) {
+
+                message.textContent =
+                    "Please enter your name.";
+
+                return;
+            }
+
+
+            if (!phone) {
+
+                message.textContent =
+                    "Please enter your phone number.";
+
+                return;
+            }
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        "/contacts",
+                        {
+                            method: "POST",
+
+                            headers: {
+                                "Content-Type":
+                                    "application/json"
+                            },
+
+                            body: JSON.stringify({
+                                name: name,
+                                phone: phone
+                            })
+                        }
+                    );
+
+
+                const result =
+                    await response.json();
+
+
+                if (response.ok) {
+
+                    message.textContent =
+                        "Contact saved successfully!";
+
+                    form.reset();
+
+                }
+                else {
+
+                    message.textContent =
+                        result.detail ||
+                        "Failed to save contact.";
+
+                }
+
+            }
+            catch (error) {
+
+                console.error(error);
+
+                message.textContent =
+                    "Error connecting to server.";
+
+            }
+
+        }
+    );
+
+</script>
+
+</body>
+
+</html>
